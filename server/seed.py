@@ -44,7 +44,12 @@ with app.app_context():
         pizza_id=2,
         restaurant_id=1
     )
+    offers2 = RestaurantPizza(
+        price=200,
+        pizza_id=1,
+        restaurant_id=1
+    )
 
-    db.session.add(offers)
+    db.session.add_all([offers,offers2])
     db.session.commit()
 
