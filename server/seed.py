@@ -21,6 +21,12 @@ with app.app_context():
         address="Westgate Mall, Mwanzi Road, Nrb 100",
     )
 
+    pizza_inn = Restaurant(
+        id=3,
+        name="Pizza Inn",
+        address="Kahawa Sukari",
+    )
+
     db.session.add_all([dominion, pizza_hut])
     db.session.commit()
 

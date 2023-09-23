@@ -76,7 +76,10 @@ class RestaurantById(Resource):
                 404
             )
             return response
-            
+
+api.add_resource(RestaurantById,'/restaurants/<int:id>')
+
+
 class Pizzas(Resource):
     def get(self):
         pizzas = []
@@ -96,7 +99,41 @@ class Pizzas(Resource):
 
 api.add_resource(Pizzas,'/pizzas') 
 
-api.add_resource(RestaurantById,'/restaurants/<int:id>')
+class RestaurantPizzas(Resource):
+    def post(self):
+        data=request.get_json()
+
+        price = data['price']
+        pizza_id = data['pizza_id']
+        restaurant_id = data['restaurant_id']
+
+        # if not (price and pizza_id and restaurant_id):
+        #         return jsonify({"errors": ["Validation errors"]}), 400
+
+
+    # Create a new RestaurantPizza instance
+        new_restaurant_pizza = RestaurantPizza(
+            price=price,
+            pizza_id=pizza_id,
+            restaurant_id=restaurant_id
+        )
+        db.session.add(new_restaurant_pizza)
+        db.session.commit()
+
+        pizza = Pizza.query.filter_by(id=pizza_id).first()
+        pizza_dict = {
+                "id": pizza.id,
+                "name": pizza.name,
+                "ingredients":pizza.ingredients,
+            }
+        response = make_response(
+            jsonify(pizza_dict),
+            201
+        )
+        return response
+    
+api.add_resource(RestaurantPizzas,'/restaurant_pizzas')    
+
 
 
 
