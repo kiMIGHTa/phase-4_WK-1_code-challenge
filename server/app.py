@@ -3,7 +3,7 @@ from flask_migrate import Migrate
 from flask_restful import Api, Resource
 from werkzeug.exceptions import NotFound
 
-from models import db, Restaurant, RestaurantPizza
+from models import db, Restaurant, RestaurantPizza, Pizza
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pizza_restaurants.db'
@@ -54,23 +54,47 @@ class RestaurantById(Resource):
     def delete(self,id):
 
         restaurant = Restaurant.query.filter_by(id=id).first()
-        restaurant_pizzas = RestaurantPizza.query.filter_by(restaurant_id=id).all()
+        if restaurant:
+            restaurant_pizzas = RestaurantPizza.query.filter_by(restaurant_id=id).all()
+            for restaurant_pizza in restaurant_pizzas:
+                db.session.delete(restaurant_pizza)
 
-        for restaurant_pizza in restaurant_pizzas:
-            db.session.delete(restaurant_pizza)
+
+            db.session.delete(restaurant)
+            db.session.commit()
 
 
-        db.session.delete(restaurant)
-        db.session.commit()
-
+            response = make_response(
+                "",
+                200
+            )
+            return response
+        else:
+            error_message = {"error": "Restaurant not found"}
+            response = make_response(
+                jsonify(error_message),
+                404
+            )
+            return response
+            
+class Pizzas(Resource):
+    def get(self):
+        pizzas = []
+        for pizza in Pizza.query.all():
+            pizza_dict={
+                "id": pizza.id,
+                "name": pizza.name,
+                "ingredients":pizza.ingredients,
+            }
+            pizzas.append(pizza_dict)
 
         response = make_response(
-            "",
+            jsonify(pizzas),
             200
         )
         return response
-            
 
+api.add_resource(Pizzas,'/pizzas') 
 
 api.add_resource(RestaurantById,'/restaurants/<int:id>')
 
