@@ -46,12 +46,12 @@ with app.app_context():
     db.session.commit()
 
     offers = RestaurantPizza(
-        price=200,
+        price=15,
         pizza_id=2,
         restaurant_id=1
     )
     offers2 = RestaurantPizza(
-        price=200,
+        price=20,
         pizza_id=1,
         restaurant_id=1
     )
